@@ -13,12 +13,14 @@ __PIECES__ = {
     "I": [
         [
             [1, 1, 1, 1]
-        ], [
+        ], 
+        [
             [1], 
             [1], 
             [1], 
             [1]
-        ]],
+        ]
+    ],
     "O": [
         [
             [1, 1], 
@@ -53,17 +55,56 @@ __PIECES__ = {
             [3, 0], 
             [3, 0]
         ],
-        [[3, 3, 3], [0, 0, 3]],
-        [[0, 3], [0, 3], [3, 3]],
+        [
+            [3, 3, 3], 
+            [0, 0, 3]],
+        [
+            [0, 3], 
+            [0, 3], 
+            [3, 3]
+        ],
     ],
     "L": [
-        [[0, 0, 4], [4, 4, 4]],
-        [[4, 0], [4, 0], [4, 4]],
-        [[4, 4, 4], [4, 0, 0]],
-        [[4, 4], [0, 4], [0, 4]],
+        [
+            [0, 0, 4], 
+            [4, 4, 4]
+        ],
+        [
+            [4, 0], 
+            [4, 0], 
+            [4, 4]],
+        [
+            [4, 4, 4], 
+            [4, 0, 0]
+        ],
+        [
+            [4, 4], 
+            [0, 4], 
+            [0, 4]
+        ],
     ],
-    "S": [[[0, 5, 5], [5, 5, 0]], [[5, 0], [5, 5], [0, 5]]],
-    "Z": [[[6, 6, 0], [0, 6, 6]], [[0, 6], [6, 6], [6, 0]]],
+    "S": [
+        [
+            [0, 5, 5], 
+            [5, 5, 0]
+        ], 
+        [
+            [5, 0], 
+            [5, 5], 
+            [0, 5]
+        ]
+    ],
+    "Z": [
+        [
+            [6, 6, 0], 
+            [0, 6, 6]
+        ], 
+        [
+            [0, 6], 
+            [6, 6], 
+            [6, 0]
+        ]
+    ],
 }
 # fmt: on
 
@@ -74,17 +115,31 @@ class Piece:
         self.__rotation_idx = self.__normalize_idx(rotation)
         self.x = x
         self.y = y
-        self.lock = False
 
     @staticmethod
     def names():
         return list(__PIECES__.keys())
 
     @staticmethod
-    def random_new(y=0, x=0):
-        name = random.choice(Piece.names())
-        rotation = random.randrange(0, 4)
-        return Piece(type=name, rotation=rotation, y=y, x=x)
+    def random_new():
+        random_x = random.randrange(0, BOARD_WIDTH - 1)
+        random_rotation = random.randrange(0, 4)
+        random_name = random.choice(Piece.names())
+
+        piece = Piece(type=random_name, rotation=random_rotation)
+
+        piece.x = max(0, min(random_x, BOARD_WIDTH - piece.width))
+        piece.y -= piece.height - 1
+
+        return piece
+
+    @staticmethod
+    def random_list(total: int = 1):
+        pieces: list[Piece] = []
+        for i in range(total):
+            pieces.append(Piece.random_new())
+
+        return pieces
 
     @property
     def shape(self):
@@ -115,10 +170,10 @@ class Piece:
             self.y = max(0, self.y - value)
 
         if direction == "DOWN":
-            self.y = min(self.y + value, BOARD_HEIGHT)
+            self.y = min(self.y + value, BOARD_HEIGHT - self.height)
 
         if direction == "RIGHT":
-            self.x = min(self.x + value, BOARD_WIDTH)
+            self.x = min(self.x + value, BOARD_WIDTH - self.width)
 
         if direction == "LEFT":
             self.x = max(0, self.x - value)

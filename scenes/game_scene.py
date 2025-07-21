@@ -1,6 +1,7 @@
 import copy
 import random
 import time
+from typing import List
 from blessed import Terminal, keyboard
 from datetime import datetime
 
@@ -29,13 +30,17 @@ class GameScene:
         self.falling_block = None
         self.prev_falling_block = None
         self.total_fallen_blocks = 0
+        self.falling_blocks_queue: List[Piece] = Piece.random_list(2)
 
         self.board = Board(width=BOARD_WIDTH, height=BOARD_HEIGHT)
         self._last_update = time.perf_counter() * 1000
 
+        # self.__mock()
+
+    def __mock(self):
         # teste
-        # self.board.insert_block(Piece("Z", x=17, y=18))
-        # self.board.insert_block(Piece("I", x=0, y=19))
+        self.board.insert_block(Piece("Z", x=7, y=18))
+        self.board.insert_block(Piece("I", x=0, y=19))
 
     def key_listener(self):
         with self.term.cbreak():
@@ -56,10 +61,25 @@ class GameScene:
                 self.falling_block.move("DOWN")
             elif key.code == self.term.KEY_UP:
                 self.falling_block.rotate()
+            elif key.lower() == "c":
+                self.falling_block = Piece.random_new(
+                    self.falling_block.y, self.falling_block.x
+                )
         else:
             self.prev_falling_block = None
 
         if key.lower() == "p":
+            text = "< PAUSE! >"
+            print(
+                self.term.move_xy(
+                    (self.board.width - len(text) // 2),
+                    self.board.height // 2,
+                )
+                + self.term.on_red
+                + text
+                + self.term.normal
+            )
+
             self.pause = not self.pause
         elif key.lower() == "r":
             self.__reset()
@@ -67,7 +87,7 @@ class GameScene:
             self.running = False
             exit(0)
 
-        print(self.term.move_xy(0, 28) + f"key event: code: [{key.code}], now: {now}]")
+        # print(self.term.move_xy(0, 28) + f"key event: code: [{key.code}], now: {now}]")
 
     def update(self):
         now = time.perf_counter() * 1000
@@ -83,21 +103,23 @@ class GameScene:
     def draw(self):
         self.__draw_board()
         self.__draw_piece(self.falling_block)
+        self.__draw_next_block()
 
         if DEBUG:
-            self.__draw_map(0, 45)
+            self.__draw_map(60, 0)
 
     def __draw_board(self):
         fg = self.term.black
-        for i, row in enumerate(self.board.shape):
-            for j, val in enumerate(row):
+        for py, row in enumerate(self.board.shape):
+            for px, val in enumerate(row):
                 bg = (
                     Color.color_by_number(val)
                     if val
                     else self.term.on_color_rgb(192, 192, 192)
                 )
+
                 print(
-                    self.term.move(i, j * CELL_WIDTH)
+                    self.term.move_xy(px * CELL_WIDTH, py)
                     + bg
                     + fg("[]" if val else "::")
                     + self.term.normal
@@ -105,29 +127,32 @@ class GameScene:
 
         print(self.term.normal)
 
-    def __draw_piece(self, piece: Piece):
+    def __draw_piece(self, piece: Piece, offset_x=0, offset_y=0):
         if not piece:
             return
 
-        print(self.term.move(24, 1) + f"VIRTUAL BLOCK[y,x]: [{piece.y}, {piece.x}] ")
-
         fg = self.term.black
-        for i, row in enumerate(piece.shape):
-            for j, val in enumerate(row):
+        for y, row in enumerate(piece.shape):
+            for x, val in enumerate(row):
                 bg = (
                     Color.color_by_number(val)
                     if val
                     else self.term.on_color_rgb(192, 192, 192)
                 )
-                py = min(piece.y + i, BOARD_HEIGHT - 1)
-                px = min(piece.x + j, BOARD_WIDTH - 1)
+                py = piece.y + y + offset_y
+                px = piece.x + x + offset_x
 
-                print(
-                    self.term.move(py, px * CELL_WIDTH)
-                    + bg
-                    + fg("[]" if val else "::")
-                    + self.term.normal
-                )
+                if (
+                    val
+                    and (py >= 0 and py < self.board.height + offset_y)
+                    and (px >= 0 and px < self.board.width + offset_x)
+                ):
+                    print(
+                        self.term.move_xy(px * CELL_WIDTH, py)
+                        + bg
+                        + fg("[]" if val else "::")
+                        + self.term.normal
+                    )
 
         print(self.term.normal)
 
@@ -136,7 +161,7 @@ class GameScene:
         for i, row in enumerate(self.board.shape):
             for j, val in enumerate(row):
                 print(
-                    self.term.move(px + i, py + j)
+                    self.term.move_xy(px + j, py + i)
                     + fg(f"{val if val else "█"}")
                     + self.term.normal
                 )
@@ -148,22 +173,41 @@ class GameScene:
             self.prev_falling_block = copy.deepcopy(self.falling_block)
             self.falling_block.move("DOWN")
 
-            print(
-                self.term.move(25, 1)
-                + f"NEXT_PIECE[name, y, x]: {self.falling_block.name, self.falling_block.y, self.falling_block.x}   "
-            )
+            # print(
+            #     self.term.move(25, 1)
+            #     + f"NEXT_PIECE[name, y, x]: {self.falling_block.name, self.falling_block.y, self.falling_block.x}   "
+            # )
 
-            if self.board.check_colision(self.falling_block):
+            if self.board.check_next_colision(self.falling_block):
                 self.board.insert_block(self.falling_block)
                 self.falling_block = None
         else:
             self.total_fallen_blocks += 1
-            self.falling_block = Piece.random_new(
-                y=0, x=random.randrange(0, BOARD_WIDTH)
-            )
-            self.falling_block.y -= self.falling_block.height - 1
-            # teste
-            # self.falling_block = Piece("I", rotation=0, y=0, x=16)
+
+            total_next_blocks = len(self.falling_blocks_queue)
+            if total_next_blocks < 2:
+                self.falling_blocks_queue.append(Piece.random_new())
+
+            self.falling_block = self.falling_blocks_queue.pop(0)
+
+        if self.total_fallen_blocks == 100:
+            self.otal_fallen_blocks = 0
+            self.__reset()
+
+    def __draw_next_block(self):
+        if len(self.falling_blocks_queue) > 0:
+            offset_x = BOARD_WIDTH * 2 + 1
+            offset_y = 1
+
+            next = copy.deepcopy(self.falling_blocks_queue[0])
+            next.x = 0
+            next.y = 0
+
+            for y in range(5):
+                for x in range(8):
+                    print(self.term.move_xy(offset_x + x, y + offset_y) + " " * 2)
+
+            self.__draw_piece(next, offset_x - 10, offset_y + 1)
 
     def __reset(self):
         self.falling_block = None
@@ -172,3 +216,4 @@ class GameScene:
 
         self.total_fallen_blocks = 0
         self.board = Board(width=BOARD_WIDTH, height=BOARD_HEIGHT)
+        # self.__mock()

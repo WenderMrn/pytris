@@ -22,4 +22,4 @@ pip freeze > requirements.txt
 
 ### Run on watch mode
 
-watchfiles 'python pytetris.py' .
+watchfiles 'python main.py' .

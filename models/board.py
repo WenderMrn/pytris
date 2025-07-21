@@ -1,4 +1,4 @@
-import copy
+from typing import List
 import numpy as np
 from config import BOARD_HEIGHT, BOARD_WIDTH
 from models.piece import Piece
@@ -18,11 +18,11 @@ class Board:
 
     @property
     def width(self):
-        return len(self.shape)
+        return len(self.shape[0])
 
     @property
     def height(self):
-        return len(self.shape[0])
+        return len(self.shape)
 
     def reset(self):
         self.__shape = self.__generate_empty_map(self.width, self.height)
@@ -34,40 +34,51 @@ class Board:
         board = self.shape
         piece_map = piece.shape
 
-        offset_x = min(piece.x, self.width)
-        offset_y = min(piece.y, self.height)
+        offset_x = min(piece.x, self.width - 1)
+        offset_y = min(piece.y, self.height - 1)
 
         for i, row in enumerate(piece_map):
             for j, val in enumerate(row):
                 if val:
-                    py = min(i + offset_y, self.height - 1)
-                    px = min(j + offset_x, self.width - 1)
-                    if not board[py][px]:
-                        board[py][px] = val
+                    py = i + offset_y
+                    px = j + offset_x
+                    if py < self.height and px < self.width and board[py]:
+                        if not board[py][px]:
+                            board[py][px] = val
 
-    # def clear_block(self, piece: Piece):
-    #     board = self.shape
-    #     piece_map = piece.shape
-
-    #     board_size = len(board)
-    #     row_size = len(piece_map)
-    #     col_size = len(piece_map[0])
-
-    #     x = min(piece.x, board_size)
-    #     y = min(piece.y, board_size)
-
-    #     for i, row in enumerate(piece_map):
-    #         for j, val in enumerate(row):
-    #             py = min(min(i + y, i + y - row_size), board_size - 1)
-    #             px = min(max(j, j + x - col_size), board_size - 1)
-    #             board[py][px] = 0
-
-    def check_colision(self, piece: Piece):
+    def clear_block(self, piece: Piece):
         board = self.shape
-        piece_max_size = max(piece.height, piece.width)
 
-        piece_box_colision = np.zeros((piece_max_size, BOARD_WIDTH))
-        board_box_colision = np.zeros((piece_max_size, BOARD_WIDTH))
+        x = min(piece.x, self.width)
+        y = min(piece.y, self.height)
+
+        for i, row in enumerate(piece.shape):
+            for j, val in enumerate(row):
+                py = min(min(i + y, i + y - piece.height), self.height - 1)
+                px = min(max(j, j + x - piece.width), self.width - 1)
+
+                board[py][px] = 0
+
+    def check_next_colision(self, piece: Piece):
+        board = self.shape
+
+        if piece.y < 0 or piece.width < 0:
+            return False
+
+        piece_box_colision = np.zeros(
+            (
+                piece.height + 1,
+                BOARD_WIDTH,
+            ),
+            dtype=int,
+        )
+        board_box_colision = np.zeros(
+            (
+                piece.height + 1,
+                BOARD_WIDTH,
+            ),
+            dtype=int,
+        )
 
         if piece.y + piece.height > BOARD_HEIGHT - 1:
             return True
@@ -75,18 +86,21 @@ class Board:
         line_colision_height = len(piece_box_colision)
         line_colision_width = len(piece_box_colision[0])
 
-        for i, row in enumerate(piece.shape):
-            for j, col in enumerate(row):
-                piece_box_colision[i][(j + piece.x) - line_colision_width] = col
+        for y, row in enumerate(piece.shape):
+            for x, col in enumerate(row):
+                if col:
+                    piece_box_colision[y][(x + piece.x) - line_colision_width] = col
 
-        for i in range(line_colision_height):
-            if (i + piece.y + 1) < BOARD_HEIGHT - 1:
-                print(term.move_xy(80, i) + f"{board[i + piece.y + 1]}" + " " * 50)
-                board_box_colision[i] = board[i + piece.y + 1]
+        offset_py = piece.y + 1
+
+        for y in range(line_colision_height):
+            py = offset_py + y
+            if py < BOARD_HEIGHT:
+                board_box_colision[y] = board[py]
 
         for i, row in enumerate(board_box_colision):
             for j, col in enumerate(row):
-                if col and piece_box_colision[i][j]:
+                if col and i < line_colision_height and piece_box_colision[i][j]:
                     return True
 
         return False
@@ -102,7 +116,7 @@ class Board:
     def print_map(self, map1, map2, x, y):
         height = len(map1) + 3
 
-        for i, row in enumerate(map1):
+        for i in range(2 * len(map1) + 3):
             print(term.move_xy(x, i + y) + f" " + " " * 50)
 
         for i, row in enumerate(map1):

@@ -38,7 +38,7 @@ def run():
             # time.sleep(max(0, time_per_frame - elapsed))
             time.sleep(time_per_frame)
 
-            print(term.move(20, 0) + f"Tick: {elapsed}")
+            # print(term.move(20, 0) + f"Tick: {elapsed}")
 
         print("exiting....")
         exit(0)
