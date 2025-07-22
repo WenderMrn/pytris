@@ -1,11 +1,7 @@
-from typing import List
 import numpy as np
 from config import BOARD_HEIGHT, BOARD_WIDTH
-from models.piece import Piece
-
-from blessed import Terminal
-
-term = Terminal()
+from core.shapes import Shapes
+from entities.piece import Piece
 
 
 class Board:
@@ -62,7 +58,7 @@ class Board:
     def check_next_colision(self, piece: Piece):
         board = self.shape
 
-        if piece.y < 0 or piece.width < 0:
+        if piece.y < 0:
             return False
 
         piece_box_colision = np.zeros(
@@ -98,6 +94,13 @@ class Board:
             if py < BOARD_HEIGHT:
                 board_box_colision[y] = board[py]
 
+        Shapes.draw_square(size=20, start_x=52, start_y=0, fill_char=" ")
+
+        Shapes.draw_map(shape=piece_box_colision, offset_x=52, offset_y=0)
+        Shapes.draw_map(
+            shape=board_box_colision, offset_x=52, offset_y=line_colision_height + 2
+        )
+
         for i, row in enumerate(board_box_colision):
             for j, col in enumerate(row):
                 if col and i < line_colision_height and piece_box_colision[i][j]:
@@ -107,21 +110,18 @@ class Board:
 
     def check_complete_line(self):
         board = self.shape
+        new_board: list[list[int]] = []
+        count = 0
 
         for i, row in enumerate(board):
-            if not 0 in row:
-                board.pop(i)
-                board.insert(0, [0 for x in range(BOARD_WIDTH)])
+            if 0 in row:
+                new_board.append(row)
+            else:
+                count += 1
 
-    def print_map(self, map1, map2, x, y):
-        height = len(map1) + 3
+        while len(new_board) < len(board):
+            new_board.insert(0, [0 for _ in range(BOARD_WIDTH)])
 
-        for i in range(2 * len(map1) + 3):
-            print(term.move_xy(x, i + y) + f" " + " " * 50)
+        self.__shape = new_board
 
-        for i, row in enumerate(map1):
-            print(term.move_xy(x, i + y) + f"{row}" + " " * 50)
-
-        if map2.any():
-            for i, row in enumerate(map2):
-                print(term.move_xy(x, i + y + height) + f"{row}" + " " * 50)
+        return count > 0, count

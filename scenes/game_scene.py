@@ -3,19 +3,17 @@ import random
 import time
 from typing import List
 from blessed import Terminal, keyboard
-from datetime import datetime
 
 from config import (
     BOARD_HEIGHT,
     BOARD_WIDTH,
     CELL_WIDTH,
     DEBUG,
-    PLAYER_SEED,
-    SPEED_GAME,
+    GAME_SPEED,
 )
-from models.board import Board
-from models.color import Color
-from models.piece import Piece
+from entities.board import Board
+from entities.color import Color
+from entities.piece import Piece
 
 BOARD_OFFSET_X = 0
 BOARD_OFFSET_Y = 0
@@ -24,8 +22,16 @@ BOARD_OFFSET_Y = 0
 class GameScene:
     def __init__(self, term: Terminal):
         self.term = term
+        self.__new_game()
+        # self.__mock()
+
+    def __new_game(self):
         self.running = True
         self.pause = False
+        self.level = 1
+        self.score = 0
+        self.lines_cleared = 0
+        self.game_speed = GAME_SPEED
 
         self.falling_block = None
         self.prev_falling_block = None
@@ -34,8 +40,6 @@ class GameScene:
 
         self.board = Board(width=BOARD_WIDTH, height=BOARD_HEIGHT)
         self._last_update = time.perf_counter() * 1000
-
-        # self.__mock()
 
     def __mock(self):
         # teste
@@ -50,7 +54,6 @@ class GameScene:
                     self.__handle_event(key)
 
     def __handle_event(self, key: keyboard.Keystroke):
-        now = time.perf_counter() * 1000
         if self.falling_block:
             self.prev_falling_block = copy.deepcopy(self.falling_block)
             if key.code == self.term.KEY_RIGHT:
@@ -61,10 +64,12 @@ class GameScene:
                 self.falling_block.move("DOWN")
             elif key.code == self.term.KEY_UP:
                 self.falling_block.rotate()
-            elif key.lower() == "c":
-                self.falling_block = Piece.random_new(
-                    self.falling_block.y, self.falling_block.x
-                )
+            # elif key.lower() == "c":
+            #     piece = copy.deepcopy(self.falling_block)
+
+            #     self.falling_block = Piece.random_new()
+            #     self.falling_block.x = piece.x
+            #     self.falling_block.y = piece.y
         else:
             self.prev_falling_block = None
 
@@ -91,13 +96,13 @@ class GameScene:
 
     def update(self):
         now = time.perf_counter() * 1000
-        interval = 1000 / SPEED_GAME
+        interval = 1000 / self.game_speed
 
         if self.pause or now - self._last_update < interval:
             return
 
-        self.__get_new_random_block()
-        self.board.check_complete_line()
+        self.__move_current_block_down()
+        self.__calculate_score()
         self._last_update = now
 
     def draw(self):
@@ -106,7 +111,26 @@ class GameScene:
         self.__draw_next_block()
 
         if DEBUG:
-            self.__draw_map(60, 0)
+            self.__draw_map(40, 0)
+
+    def __calculate_score(self):
+        yes, count = self.board.check_complete_line()
+
+        print(
+            self.term.move_xy(80, 1)
+            + f"Score: {self.score}, level: {self.level}, yes: {yes}, count: {count}, speed; {self.game_speed}"
+            + " " * 5
+        )
+
+        if not yes:
+            return
+
+        score_per_lines = {1: 40, 2: 200, 3: 300, 4: 1200}
+
+        self.score += score_per_lines.get(count, 0) * self.level
+        self.lines_cleared += count
+        self.level = max(1, self.lines_cleared // 10)
+        self.game_speed = min(max(2.2, self.level / 1.5 * GAME_SPEED + 0.5), 80)
 
     def __draw_board(self):
         fg = self.term.black
@@ -156,19 +180,19 @@ class GameScene:
 
         print(self.term.normal)
 
-    def __draw_map(self, px=0, py=0):
+    def __draw_map(self, offset_px=0, offset_py=0):
         fg = self.term.black
         for i, row in enumerate(self.board.shape):
             for j, val in enumerate(row):
                 print(
-                    self.term.move_xy(px + j, py + i)
+                    self.term.move_xy(j + offset_px, i + offset_py)
                     + fg(f"{val if val else "█"}")
                     + self.term.normal
                 )
 
         print(self.term.normal)
 
-    def __get_new_random_block(self):
+    def __move_current_block_down(self):
         if self.falling_block:
             self.prev_falling_block = copy.deepcopy(self.falling_block)
             self.falling_block.move("DOWN")
@@ -190,9 +214,7 @@ class GameScene:
 
             self.falling_block = self.falling_blocks_queue.pop(0)
 
-        if self.total_fallen_blocks == 100:
-            self.otal_fallen_blocks = 0
-            self.__reset()
+            time.sleep(0.1)
 
     def __draw_next_block(self):
         if len(self.falling_blocks_queue) > 0:
@@ -210,10 +232,5 @@ class GameScene:
             self.__draw_piece(next, offset_x - 10, offset_y + 1)
 
     def __reset(self):
-        self.falling_block = None
-        self.running = True
-        self.tick = 0
-
-        self.total_fallen_blocks = 0
-        self.board = Board(width=BOARD_WIDTH, height=BOARD_HEIGHT)
+        self.__new_game()
         # self.__mock()

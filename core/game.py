@@ -4,10 +4,7 @@ import time
 
 from blessed import Terminal
 
-from config import PLAYER_SEED, SPEED_GAME
-from models.board import Board
-from models.color import Color
-from models.piece import Piece
+from config import GAME_SPEED
 from scenes.game_scene import GameScene
 
 term = Terminal()
@@ -17,7 +14,7 @@ def run():
     with term.fullscreen(), term.cbreak(), term.hidden_cursor():
         scene = GameScene(term)
         running = True
-        time_per_frame = 1 / SPEED_GAME
+        time_per_frame = 1 / GAME_SPEED
 
         print(term.home + term.clear)
 

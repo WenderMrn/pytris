@@ -2,111 +2,10 @@ import random
 import time
 from typing import Literal
 
-from config import BOARD_HEIGHT, BOARD_WIDTH
+
+from config import PIECES, BOARD_HEIGHT, BOARD_WIDTH, PIECE_NAMES
 
 random.seed(time.time())
-
-PIECE_NAMES = Literal["I", "O", "T", "J", "L", "S", "Z"]
-
-# fmt: off
-__PIECES__ = {
-    "I": [
-        [
-            [1, 1, 1, 1]
-        ], 
-        [
-            [1], 
-            [1], 
-            [1], 
-            [1]
-        ]
-    ],
-    "O": [
-        [
-            [1, 1], 
-            [1, 1]
-        ]
-    ],
-    "T": [
-        [
-            [0, 2, 0], 
-            [2, 2, 2]],
-        [
-            [2, 0], 
-            [2, 2], 
-            [2, 0]
-        ],
-        [
-            [2, 2, 2], 
-            [0, 2, 0]
-        ],
-        [
-            [0, 2], 
-            [2, 2], 
-            [0, 2]],
-    ],
-    "J": [
-        [
-            [3, 0, 0], 
-            [3, 3, 3]
-        ],
-        [
-            [3, 3], 
-            [3, 0], 
-            [3, 0]
-        ],
-        [
-            [3, 3, 3], 
-            [0, 0, 3]],
-        [
-            [0, 3], 
-            [0, 3], 
-            [3, 3]
-        ],
-    ],
-    "L": [
-        [
-            [0, 0, 4], 
-            [4, 4, 4]
-        ],
-        [
-            [4, 0], 
-            [4, 0], 
-            [4, 4]],
-        [
-            [4, 4, 4], 
-            [4, 0, 0]
-        ],
-        [
-            [4, 4], 
-            [0, 4], 
-            [0, 4]
-        ],
-    ],
-    "S": [
-        [
-            [0, 5, 5], 
-            [5, 5, 0]
-        ], 
-        [
-            [5, 0], 
-            [5, 5], 
-            [0, 5]
-        ]
-    ],
-    "Z": [
-        [
-            [6, 6, 0], 
-            [0, 6, 6]
-        ], 
-        [
-            [0, 6], 
-            [6, 6], 
-            [6, 0]
-        ]
-    ],
-}
-# fmt: on
 
 
 class Piece:
@@ -118,7 +17,7 @@ class Piece:
 
     @staticmethod
     def names():
-        return list(__PIECES__.keys())
+        return list(PIECES.keys())
 
     @staticmethod
     def random_new():
@@ -187,7 +86,7 @@ class Piece:
         return Piece(self.__name, self.__normalize_idx(self.__rotation_idx + 1))
 
     def __normalize_idx(self, index: int):
-        return index % len(__PIECES__[self.__name])
+        return index % len(PIECES[self.__name])
 
     def __shape_by_index(self, idx: int):
-        return __PIECES__[self.__name][self.__normalize_idx(idx)]
+        return PIECES[self.__name][self.__normalize_idx(idx)]
