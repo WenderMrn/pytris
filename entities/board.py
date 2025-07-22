@@ -58,9 +58,6 @@ class Board:
     def check_next_colision(self, piece: Piece):
         board = self.shape
 
-        if piece.y < 0:
-            return False
-
         piece_box_colision = np.zeros(
             (
                 piece.height + 1,
@@ -84,8 +81,11 @@ class Board:
 
         for y, row in enumerate(piece.shape):
             for x, col in enumerate(row):
-                if col:
-                    piece_box_colision[y][(x + piece.x) - line_colision_width] = col
+                py = piece.y + y
+                if col and py >= 0:
+                    piece_box_colision[min(py, y)][
+                        (piece.x + x) - line_colision_width
+                    ] = col
 
         offset_py = piece.y + 1
 
@@ -94,11 +94,9 @@ class Board:
             if py < BOARD_HEIGHT:
                 board_box_colision[y] = board[py]
 
-        Shapes.draw_square(size=20, start_x=52, start_y=0, fill_char=" ")
-
         Shapes.draw_map(shape=piece_box_colision, offset_x=52, offset_y=0)
         Shapes.draw_map(
-            shape=board_box_colision, offset_x=52, offset_y=line_colision_height + 2
+            shape=board_box_colision, offset_x=52, offset_y=line_colision_height + 5
         )
 
         for i, row in enumerate(board_box_colision):

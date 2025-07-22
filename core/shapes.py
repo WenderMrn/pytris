@@ -15,7 +15,8 @@ class Shapes:
         *,
         start_x: int = 0,
         start_y: int = 0,
-        size: int,
+        height: int = 0,
+        width: int = 0,
         fill_char: str = " ",
         clear_screen: bool = False,
         bg_color: Rgb = Rgb(0, 0, 0),
@@ -23,8 +24,8 @@ class Shapes:
         if clear_screen:
             print(TERM.home + TERM.clear)
 
-        for y in range(size):
-            for x in range(size):
+        for y in range(height):
+            for x in range(width):
                 print(
                     TERM.move_xy((start_x + x) * CELL_WIDTH, start_y + y)
                     + (fill_char * CELL_WIDTH)
