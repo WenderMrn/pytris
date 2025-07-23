@@ -29,7 +29,7 @@ class GameScene:
         self.running = True
         self.pause = False
         self.game_over = False
-        self.level = 1
+        self.level = 0
         self.score = 0
         self.lines_cleared = 0
         self.game_speed = GAME_SPEED
