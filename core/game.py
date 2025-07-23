@@ -24,9 +24,11 @@ def run():
             start_time = time.time()
             # Limpa a tela
 
-            if not scene.pause:
+            if not scene.pause and not scene.game_over:
                 scene.update()
                 scene.draw()
+            else:
+                scene.show_messages()
 
             running = scene.running
 

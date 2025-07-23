@@ -1,5 +1,5 @@
 from typing import List
-from config import CELL_WIDTH, TERM
+from config import BOARD_HEIGHT, BOARD_WIDTH, CELL_WIDTH, TERM
 
 
 class Rgb:
@@ -24,12 +24,13 @@ class Shapes:
         if clear_screen:
             print(TERM.home + TERM.clear)
 
+        if height == 0 or width == 0:
+            height = max(height, width)
+            width = height
+
         for y in range(height):
             for x in range(width):
-                print(
-                    TERM.move_xy((start_x + x) * CELL_WIDTH, start_y + y)
-                    + (fill_char * CELL_WIDTH)
-                )
+                print(TERM.move_xy(start_x + x, start_y + y) + (fill_char))
 
     @staticmethod
     def draw_map(*, shape: list[list[int]], offset_x=0, offset_y=0):
@@ -43,3 +44,21 @@ class Shapes:
                 )
 
         print(TERM.normal)
+
+    @staticmethod
+    def draw_text(
+        text: str, center: bool = False, bg=TERM.normal, x: int = 0, y: int = 0
+    ):
+        if center:
+            x = BOARD_WIDTH - len(text) // 2
+            y = BOARD_HEIGHT // 2
+
+        print(
+            TERM.move_xy(
+                x,
+                y,
+            )
+            + bg
+            + text
+            + TERM.normal
+        )

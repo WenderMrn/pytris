@@ -1,5 +1,5 @@
 import numpy as np
-from config import BOARD_HEIGHT, BOARD_WIDTH
+from config import BOARD_HEIGHT, BOARD_WIDTH, TERM
 from core.shapes import Shapes
 from entities.piece import Piece
 
@@ -33,12 +33,18 @@ class Board:
         offset_x = min(piece.x, self.width - 1)
         offset_y = min(piece.y, self.height - 1)
 
-        for i, row in enumerate(piece_map):
-            for j, val in enumerate(row):
+        for y, row in enumerate(piece_map):
+            for x, val in enumerate(row):
                 if val:
-                    py = i + offset_y
-                    px = j + offset_x
-                    if py < self.height and px < self.width and board[py]:
+                    py = y + offset_y
+                    px = x + offset_x
+                    if (
+                        py >= 0
+                        and py < self.height
+                        and px >= 0
+                        and px < self.width
+                        and board[py]
+                    ):
                         if not board[py][px]:
                             board[py][px] = val
 
@@ -55,56 +61,45 @@ class Board:
 
                 board[py][px] = 0
 
-    def check_next_colision(self, piece: Piece):
-        board = self.shape
+    def has_top_conflict(self, piece: Piece, num_lines=2):
+        num_lines = min(num_lines, BOARD_HEIGHT - 1)
+        for y in range(num_lines):
+            for x, cell in enumerate(self.shape[y]):
+                py = y - piece.y
+                px = x - piece.x
 
-        piece_box_colision = np.zeros(
-            (
-                piece.height + 1,
-                BOARD_WIDTH,
-            ),
-            dtype=int,
-        )
-        board_box_colision = np.zeros(
-            (
-                piece.height + 1,
-                BOARD_WIDTH,
-            ),
-            dtype=int,
-        )
+                if (
+                    cell
+                    and py >= 0
+                    and py < piece.height - 1
+                    and px >= 0
+                    and px < piece.width - 1
+                    and piece.shape[py][px]
+                ):
+                    return True
+        return False
 
-        if piece.y + piece.height > BOARD_HEIGHT - 1:
-            return True
-
-        line_colision_height = len(piece_box_colision)
-        line_colision_width = len(piece_box_colision[0])
+    def check_next_collision(self, piece: Piece):
+        # print(
+        #     TERM.move_xy(80, 2)
+        #     + f"Piece[x, y]: {piece.x, piece.y} / Piece[height, width]: {piece.height, piece.width} "
+        #     + " " * 5
+        # )
 
         for y, row in enumerate(piece.shape):
             for x, col in enumerate(row):
-                py = piece.y + y
-                if col and py >= 0:
-                    piece_box_colision[min(py, y)][
-                        (piece.x + x) - line_colision_width
-                    ] = col
+                py = piece.y + y + 2 if piece.y + piece.height < 1 else piece.y + y + 1
+                px = piece.x + x
 
-        offset_py = piece.y + 1
+                if col and py >= 0 and py < self.height and px >= 0 and px < self.width:
+                    overflow = piece.y <= 0
+                    if self.shape[py][px]:
+                        return True, overflow
 
-        for y in range(line_colision_height):
-            py = offset_py + y
-            if py < BOARD_HEIGHT:
-                board_box_colision[y] = board[py]
+        if piece.y + piece.height > self.height - 1:
+            return True, False
 
-        Shapes.draw_map(shape=piece_box_colision, offset_x=52, offset_y=0)
-        Shapes.draw_map(
-            shape=board_box_colision, offset_x=52, offset_y=line_colision_height + 5
-        )
-
-        for i, row in enumerate(board_box_colision):
-            for j, col in enumerate(row):
-                if col and i < line_colision_height and piece_box_colision[i][j]:
-                    return True
-
-        return False
+        return False, False
 
     def check_complete_line(self):
         board = self.shape
@@ -123,3 +118,22 @@ class Board:
         self.__shape = new_board
 
         return count > 0, count
+
+    def find_first_occupied_row(self):
+        for y, row in enumerate(self.shape):
+            if any(cell > 0 for cell in row):
+                return y
+
+        return -1
+
+    def __draw_map(self, offset_px=0, offset_py=0):
+        fg = TERM.black
+        for y, row in enumerate(self.shape):
+            for x, val in enumerate(row):
+                print(
+                    TERM.move_xy(x + offset_px, y + offset_py)
+                    + fg(f"{val if val else "█"}")
+                    + TERM.normal
+                )
+
+        print(TERM.normal)
