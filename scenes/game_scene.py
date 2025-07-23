@@ -58,21 +58,28 @@ class GameScene:
 
     def __handle_event(self, key: keyboard.Keystroke):
         if self.falling_block:
+            try_move = copy.deepcopy(self.falling_block)
             self.prev_falling_block = copy.deepcopy(self.falling_block)
             if key.code == self.term.KEY_RIGHT:
-                self.falling_block.move("RIGHT")
+                try_move.move("RIGHT")
+                conclfict, _ = self.board.check_next_collision(try_move)
+                if not conclfict:
+                    self.falling_block.move("RIGHT")
             elif key.code == self.term.KEY_LEFT:
-                self.falling_block.move("LEFT")
+                try_move.move("LEFT")
+                conclfict, _ = self.board.check_next_collision(try_move)
+                if not conclfict:
+                    self.falling_block.move("LEFT")
             elif key.code == self.term.KEY_DOWN:
-                self.falling_block.move("DOWN")
-            elif key.code == self.term.KEY_UP:
-                self.falling_block.rotate()
-            # elif key.lower() == "c":
-            #     piece = copy.deepcopy(self.falling_block)
+                while self.falling_block:
+                    self.__move_current_block_down()
 
-            #     self.falling_block = Piece.random_new()
-            #     self.falling_block.x = piece.x
-            #     self.falling_block.y = piece.y
+            elif key.code == self.term.KEY_UP:
+                try_move.rotate()
+                conclfict, _ = self.board.check_next_collision(try_move)
+
+                if not conclfict:
+                    self.falling_block.rotate()
         else:
             self.prev_falling_block = None
 
@@ -205,14 +212,13 @@ class GameScene:
             has_collision, overflow = self.board.check_next_collision(
                 self.falling_block
             )
-            if overflow:
-                self.board.insert_block(self.falling_block)
-                self.falling_block = None
-                self.game_over = True
-            elif has_collision:
+
+            if has_collision:
                 self.board.insert_block(self.falling_block)
                 self.falling_block = None
 
+            if overflow:
+                self.game_over = True
         else:
             self.total_fallen_blocks += 1
             total_next_blocks = len(self.falling_blocks_queue)
