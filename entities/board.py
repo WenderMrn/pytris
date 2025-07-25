@@ -60,31 +60,7 @@ class Board:
 
                 board[py][px] = 0
 
-    def has_top_conflict(self, piece: Piece, num_lines=2):
-        num_lines = min(num_lines, BOARD_HEIGHT - 1)
-        for y in range(num_lines):
-            for x, cell in enumerate(self.shape[y]):
-                py = y - piece.y
-                px = x - piece.x
-
-                if (
-                    cell
-                    and py >= 0
-                    and py < piece.height - 1
-                    and px >= 0
-                    and px < piece.width - 1
-                    and piece.shape[py][px]
-                ):
-                    return True
-        return False
-
     def check_next_collision(self, piece: Piece):
-        # print(
-        #     TERM.move_xy(80, 2)
-        #     + f"Piece[x, y]: {piece.x, piece.y} / Piece[height, width]: {piece.height, piece.width} "
-        #     + " " * 5
-        # )
-
         for y, row in enumerate(piece.shape):
             for x, col in enumerate(row):
                 py = piece.y + y + 2 if piece.y + piece.height < 1 else piece.y + y + 1
@@ -117,22 +93,3 @@ class Board:
         self.__shape = new_board
 
         return count > 0, count
-
-    def find_first_occupied_row(self):
-        for y, row in enumerate(self.shape):
-            if any(cell > 0 for cell in row):
-                return y
-
-        return -1
-
-    def __draw_map(self, offset_px=0, offset_py=0):
-        fg = TERM.black
-        for y, row in enumerate(self.shape):
-            for x, val in enumerate(row):
-                print(
-                    TERM.move_xy(x + offset_px, y + offset_py)
-                    + fg(f"{val if val else "█"}")
-                    + TERM.normal
-                )
-
-        print(TERM.normal)

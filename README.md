@@ -23,3 +23,7 @@ pip freeze > requirements.txt
 ### Run on watch mode
 
 watchfiles 'python main.py' .
+
+### Keep console size
+
+Keep the console at a minimum of 100x30

@@ -105,7 +105,7 @@ class GameScene(ScreenGame):
         self.__draw_total_lines()
         self.__draw_player()
 
-        if self.pause or not self.running or not self.running:
+        if self.pause or not self.running:
             return
 
         Drawer.draw_board(board=self.board)
@@ -115,6 +115,8 @@ class GameScene(ScreenGame):
             self.__draw_map(40, 0)
 
     def show_info(self):
+        Drawer.render_game_instructions("GAME", 13, 25)
+
         if self.pause:
             Drawer.draw_text(
                 text="PAUSED",
@@ -188,48 +190,50 @@ class GameScene(ScreenGame):
             time.sleep(0.1)
 
     def __draw_total_lines(self):
-        offset_x = BOARD_WIDTH * 2 - 1
+        offset_x = BOARD_WIDTH * 2 + 10
+        offset_y = 1
         Drawer.draw_text(
-            text="         LINES        ",
+            text="        LINES       ",
             fg=self.term.black,
             bg=self.term.on_darkseagreen,
             x=offset_x,
-            y=0,
+            y=offset_y,
         )
         Drawer.draw_text(
             text=f" {self.lines_cleared}               ",
             x=offset_x,
-            y=1,
+            y=offset_y + 2,
         )
 
     def __draw_player(self):
-        offset_x = 0
+        offset_x = 10
+        offset_y = 4
         Drawer.draw_text(
             text="      PLAYER      ",
             fg=self.term.black,
             bg=self.term.on_darkseagreen,
             x=offset_x,
-            y=0,
+            y=offset_y,
         )
         Drawer.draw_text(
             text=f" {self.player}",
             x=offset_x,
-            y=1,
+            y=offset_y + 2,
         )
 
     def __draw_game_info(self):
         next_piece = self.falling_blocks_queue[0]
         next_box_width = BOARD_WIDTH * 2 + BOARD["OFFSET_X"] + 2
-        score_y = 0
-        next_y = 5
-        level_y = next_y + score_y + 8
+        score_y = 4
+        next_y = 10
+        level_y = next_y + score_y + 4
 
         Drawer.draw_square(
-            width=BOARD_WIDTH * 2,
+            width=BOARD_WIDTH * 2 + 2,
             height=8,
             fill_char=" ",
             start_x=next_box_width,
-            start_y=6,
+            start_y=next_y + 1,
         )
 
         Drawer.draw_text(
@@ -242,7 +246,7 @@ class GameScene(ScreenGame):
         Drawer.draw_text(
             text=f" {self.score}",
             x=next_box_width,
-            y=score_y + 1,
+            y=score_y + 2,
         )
 
         Drawer.draw_text(
@@ -264,8 +268,8 @@ class GameScene(ScreenGame):
             Drawer.draw_piece(
                 board=self.board,
                 piece=next,
-                offset_x=offset_x,
-                offset_y=offset_y + next_y,
+                x=offset_x,
+                y=offset_y + next_y,
             )
 
         Drawer.draw_text(
@@ -278,7 +282,7 @@ class GameScene(ScreenGame):
         Drawer.draw_text(
             text=f" {self.level}",
             x=next_box_width,
-            y=level_y + 1,
+            y=level_y + 2,
         )
 
     def __reset(self):

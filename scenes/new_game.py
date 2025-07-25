@@ -13,9 +13,11 @@ class NewGame(ScreenGame):
         if not self.__update_draw:
             return
 
+        Drawer.render_game_instructions("NEW_GAME")
+
         offset_x = 20
         Drawer.draw_square(
-            width=50,
+            width=56,
             height=20,
             fill_char=" ",
             start_x=offset_x,
@@ -24,16 +26,16 @@ class NewGame(ScreenGame):
         )
 
         Drawer.draw_square(
-            width=50,
+            width=52,
             height=5,
             fill_char=" ",
-            start_x=offset_x,
+            start_x=offset_x + 2,
             start_y=9,
             bg_color=TERM.on_lightyellow3,
         )
 
         Drawer.render_block_text(
-            text="Name: ",
+            text="New game",
             x=offset_x + 4,
             y=5,
             fg_color=TERM.black,
@@ -51,10 +53,10 @@ class NewGame(ScreenGame):
         self.__update_draw = False
 
     def update(self):
-        return super().update()
+        pass
 
     def show_info(self):
-        return super().show_info()
+        pass
 
     def handle_event(self, key):
         if key.code in (TERM.KEY_ENTER, TERM.KEY_RETURN) and self.player:
@@ -62,7 +64,7 @@ class NewGame(ScreenGame):
         elif key.code == TERM.KEY_BACKSPACE:
             self.player = self.player[:-1]
             self.__update_draw = True
-        elif (key.isalnum() or key == " ") and len(self.player) <= 10:
+        elif (key.isalnum() or key == " ") and len(self.player) <= 15:
             self.player += key.upper()
             self.__update_draw = True
         elif key.code == TERM.KEY_ESCAPE or key == "\x1b":

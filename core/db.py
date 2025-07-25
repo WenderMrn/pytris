@@ -12,11 +12,11 @@ with sqlite3.connect("pytetris_database.db", check_same_thread=False) as conn:
         def __create_tables(self):
             cursor.execute(
                 """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                score INTEGER
-            )
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    score INTEGER
+                )
             """
             )
 

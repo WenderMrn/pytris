@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Literal
 from config import (
     BLOCK_LETTERS,
     BOARD,
@@ -110,18 +110,18 @@ class Drawer:
         *,
         board: Board,
         piece: Piece,
-        offset_x=BOARD["OFFSET_X"],
-        offset_y=BOARD["OFFSET_Y"],
+        x=BOARD["OFFSET_X"],
+        y=BOARD["OFFSET_Y"],
     ):
         if not piece:
             return
 
-        for y, row in enumerate(piece.shape):
-            for x, val in enumerate(row):
+        for shape_y, row in enumerate(piece.shape):
+            for shape_x, val in enumerate(row):
                 bg = Color.bg_color(val) if val else TERM.on_white
                 fg = Color.fg_color(val) if val else TERM.white
-                py = piece.y + y
-                px = piece.x + x
+                py = piece.y + shape_y
+                px = piece.x + shape_x
 
                 if (
                     val
@@ -129,7 +129,7 @@ class Drawer:
                     and (px >= 0 and px < board.width)
                 ):
                     print(
-                        TERM.move_xy(px * CELL_WIDTH + offset_x, py + offset_y)
+                        TERM.move_xy(px * CELL_WIDTH + x, py + y)
                         + bg
                         + fg("[]" if val else "")
                         + TERM.normal
@@ -141,18 +141,17 @@ class Drawer:
     def render_text(
         *,
         text: str,
-        font_size: int = 1,
         fg_color=None,
         bg_color=TERM.normal,
-        offset_x=BOARD["OFFSET_X"],
-        offset_y=BOARD["OFFSET_Y"],
+        x=BOARD["OFFSET_X"],
+        y=BOARD["OFFSET_Y"],
     ):
 
-        big_text = text2art(text=text.upper(), font="miniwi")
+        big_text = text2art(text=text.upper(), font="big")
 
         for i, line in enumerate(big_text.splitlines()):
             print(
-                TERM.move_xy(offset_x, offset_y + i)
+                TERM.move_xy(x, y + i)
                 + bg_color
                 + (fg_color(line) if fg_color else line)
                 + TERM.normal
@@ -197,3 +196,28 @@ class Drawer:
                 + (fg_color(line) if fg_color else line)
                 + TERM.normal
             )
+
+    @staticmethod
+    def render_game_instructions(
+        instruction: Literal["MENU", "GAME", "NEW_GAME", "BACK"] = "MENU",
+        x: int = 20,
+        y: int = 25,
+    ):
+        messages: List[str] = []
+        if instruction == "GAME":
+            messages.append("Controls: → / ← to move / ↑ to rotate / ↓ to drop faster")
+            messages.append('ESC to go back menu / "P" to pause / "R" to reset')
+        elif instruction == "MENU":
+            messages.append("Controls: ↑ to up / ↓ to down / ENTER to confirm")
+        elif instruction == "NEW_GAME":
+            messages.append("Controls: type your name and press ENTER to confirm")
+        elif instruction == "BACK":
+            messages.append("Controls: ESC to go back menu")
+
+        if len(messages) > 0:
+            for ly, line in enumerate(messages):
+                print(TERM.move_xy(x, y + ly) + line + TERM.normal, end="")
+
+    @staticmethod
+    def render_screen():
+        pass

@@ -1,3 +1,5 @@
+import os
+import platform
 import time
 
 from blessed import Terminal
@@ -11,7 +13,16 @@ term = Terminal()
 key_observable = KeyEventObservable(term)
 
 
+def resize_terminal(cols=100, rows=30):
+    if platform.system() == "Windows":
+        os.system(f"mode con: cols={cols} lines={rows}")
+    else:
+        # ANSI escape sequence (pode não funcionar em todos os terminais)
+        print(f"\033[8;{rows};{cols}t")
+
+
 def run():
+    resize_terminal()
     with term.fullscreen(), term.cbreak(), term.hidden_cursor():
         screen_manager = ScreenManager()
         running = True

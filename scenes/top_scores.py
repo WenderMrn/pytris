@@ -15,6 +15,8 @@ class TopScores(ScreenGame):
         if not self.__update_draw:
             return
 
+        Drawer.render_game_instructions("BACK")
+
         offset_x = 20
         Drawer.draw_square(
             width=50,
@@ -27,9 +29,9 @@ class TopScores(ScreenGame):
 
         Drawer.render_block_text(
             text="Best Scores",
-            x=offset_x + 4,
+            x=offset_x + 9,
             y=5,
-            fg_color=TERM.black,
+            fg_color=TERM.palegreen1,
             bg_color=TERM.on_darkseagreen,
         )
 

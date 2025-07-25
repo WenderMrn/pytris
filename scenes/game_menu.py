@@ -47,33 +47,57 @@ class GameMenu(ScreenGame):
         ]
 
     def __draw_backgorund(self):
+        if not self.__current_item:
+            return
+
+        Drawer.clear_screen()
+        Drawer.render_game_instructions()
+
         offset_x = 20
+        offset_screen_y = 2
+        offset_arrow_y = (offset_screen_y + 1) * self.__current_item
+        offset_menu_y = 8
+
         Drawer.draw_square(
-            width=50,
-            height=20,
+            width=52,
+            height=22,
             fill_char=" ",
             start_x=offset_x,
-            start_y=4,
+            start_y=offset_screen_y,
             bg_color=TERM.on_darkseagreen,
+        )
+
+        Drawer.render_text(
+            text="Pytris ",
+            fg_color=TERM.black,
+            bg_color=TERM.on_darkseagreen,
+            x=offset_x + 1,
+            y=offset_screen_y,
+        )
+        Drawer.draw_text(
+            text="+" * 50,
+            x=offset_x + 1,
+            y=offset_screen_y + 6,
+            fg=TERM.black,
+            bg=TERM.on_darkseagreen,
         )
 
         for y, item in enumerate(self.__options):
             Drawer.render_block_text(
                 text=item.label,
-                x=offset_x + 10,
-                y=5 + (y * 5),
-                fg_color=TERM.black,
+                x=offset_x + 12,
+                y=offset_screen_y + (y * 5) + offset_menu_y,
+                fg_color=(
+                    TERM.black if self.__current_item != y + 1 else TERM.palegreen1
+                ),
                 bg_color=TERM.on_darkseagreen,
             )
-
-        if not self.__current_item:
-            return
 
         Drawer.render_block_text(
             text=">",
             x=offset_x + 5,
-            y=5 * self.__current_item,
-            fg_color=TERM.black,
+            y=offset_arrow_y + offset_menu_y - 1,
+            fg_color=TERM.palegreen1,
             bg_color=TERM.on_darkseagreen,
         )
 

@@ -2,4 +2,8 @@ from core import game
 
 
 if __name__ == "__main__":
-    game.run()
+    try:
+        game.run()
+    except KeyboardInterrupt:
+        # print("\nExecution interrupted by the user.")
+        pass

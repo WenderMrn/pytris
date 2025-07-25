@@ -7,7 +7,7 @@ from core.db import Db
 TERM = Terminal()
 CONN = Db()
 
-BOARD: Final = {"WIDTH": 10, "HEIGHT": 10, "OFFSET_X": 20, "OFFSET_Y": 3}
+BOARD: Final = {"WIDTH": 10, "HEIGHT": 10, "OFFSET_X": 30, "OFFSET_Y": 4}
 
 BOARD_WIDTH: Final = 10
 BOARD_HEIGHT: Final = 20
