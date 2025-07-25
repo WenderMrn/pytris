@@ -1,17 +1,20 @@
 import copy
-import random
 import time
 from typing import List
 from blessed import Terminal, keyboard
 
 from config import (
+    BOARD,
     BOARD_HEIGHT,
     BOARD_WIDTH,
-    CELL_WIDTH,
+    CONN,
     DEBUG,
     GAME_SPEED,
 )
-from core.shapes import Shapes
+from core.db import Db
+from core.drawer import Drawer
+from core.screen_game import ScreenGame
+from core.types import GameEvent
 from entities.board import Board
 from entities.color import Color
 from entities.piece import Piece
@@ -20,9 +23,10 @@ BOARD_OFFSET_X = 0
 BOARD_OFFSET_Y = 0
 
 
-class GameScene:
-    def __init__(self, term: Terminal):
+class GameScene(ScreenGame):
+    def __init__(self, term: Terminal, player: str):
         self.term = term
+        self.player = player
         self.__new_game()
 
     def __new_game(self):
@@ -42,33 +46,24 @@ class GameScene:
         self.board = Board(width=BOARD_WIDTH, height=BOARD_HEIGHT)
         self._last_update = time.perf_counter() * 1000
 
-        # self.__mock()
-
     def __mock(self):
         # teste
         self.board.insert_block(Piece("I", x=0, y=5))
         self.board.insert_block(Piece("I", x=5, y=5))
 
-    def key_listener(self):
-        with self.term.cbreak():
-            while True:
-                key = self.term.inkey(timeout=0.01)
-                if key:
-                    self.__handle_event(key)
-
-    def __handle_event(self, key: keyboard.Keystroke):
+    def handle_event(self, key: keyboard.Keystroke):
         if self.falling_block:
             try_move = copy.deepcopy(self.falling_block)
             self.prev_falling_block = copy.deepcopy(self.falling_block)
             if key.code == self.term.KEY_RIGHT:
                 try_move.move("RIGHT")
-                conclfict, _ = self.board.check_next_collision(try_move)
-                if not conclfict:
+                collision, _ = self.board.check_next_collision(try_move)
+                if not collision:
                     self.falling_block.move("RIGHT")
             elif key.code == self.term.KEY_LEFT:
                 try_move.move("LEFT")
-                conclfict, _ = self.board.check_next_collision(try_move)
-                if not conclfict:
+                collision, _ = self.board.check_next_collision(try_move)
+                if not collision:
                     self.falling_block.move("LEFT")
             elif key.code == self.term.KEY_DOWN:
                 while self.falling_block:
@@ -76,9 +71,9 @@ class GameScene:
 
             elif key.code == self.term.KEY_UP:
                 try_move.rotate()
-                conclfict, _ = self.board.check_next_collision(try_move)
+                collision, _ = self.board.check_next_collision(try_move)
 
-                if not conclfict:
+                if not collision:
                     self.falling_block.rotate()
         else:
             self.prev_falling_block = None
@@ -87,22 +82,18 @@ class GameScene:
             self.pause = not self.pause
         elif key.lower() == "r":
             self.__reset()
-        elif key.lower() == "q":
+        elif key.code == self.term.KEY_ESCAPE or key == "\x1b":
             self.running = False
-            exit(0)
-
-        # print(self.term.move_xy(0, 28) + f"key event: code: [{key.code}], now: {now}]")
+            return GameEvent("Esc", "SCREEN_MENU", 0)
 
     def update(self):
+        if self.pause or self.game_over or not self.running:
+            return
+
         now = time.perf_counter() * 1000
         interval = 1000 / self.game_speed
 
-        if (
-            self.pause
-            or self.game_over
-            or not self.running
-            or now - self._last_update < interval
-        ):
+        if now - self._last_update < interval:
             return
 
         self.__move_current_block_down()
@@ -110,29 +101,39 @@ class GameScene:
         self._last_update = now
 
     def draw(self):
+        self.__draw_game_info()
+        self.__draw_total_lines()
+        self.__draw_player()
+
         if self.pause or not self.running or not self.running:
             return
 
-        self.__draw_board()
-        self.__draw_piece(self.falling_block)
-        self.__draw_game_info()
+        Drawer.draw_board(board=self.board)
+        Drawer.draw_piece(board=self.board, piece=self.falling_block)
 
         if DEBUG:
             self.__draw_map(40, 0)
 
-    def show_messages(self):
+    def show_info(self):
         if self.pause:
-            Shapes.draw_text(text="PAUSED", center=True, bg=self.term.on_red)
+            Drawer.draw_text(
+                text="PAUSED",
+                center=True,
+                bg=self.term.on_red,
+                offset_y=BOARD["OFFSET_Y"],
+                offset_x=BOARD["OFFSET_X"],
+            )
         elif self.game_over:
-            Shapes.draw_text(text="GAME OVER!", center=True, bg=self.term.on_red)
+            Drawer.draw_text(
+                text="GAME OVER!",
+                center=True,
+                bg=self.term.on_red,
+                offset_y=BOARD["OFFSET_Y"],
+                offset_x=BOARD["OFFSET_X"],
+            )
 
     def __calculate_score(self):
         yes, count = self.board.check_complete_line()
-        # print(
-        #     self.term.move_xy(80, 1)
-        #     + f"Score: {self.score}, level: {self.level}, yes: {yes}, count: {count}, speed: {self.game_speed}, lines: {self.lines_cleared}"
-        #     + " " * 5
-        # )
 
         if not yes:
             return
@@ -143,54 +144,6 @@ class GameScene:
         self.lines_cleared += count
         self.level = max(0, self.lines_cleared // 10)
         self.game_speed = min(GAME_SPEED + (self.level * 0.25), 80)
-
-    def __draw_board(self):
-        fg = self.term.black
-        for py, row in enumerate(self.board.shape):
-            for px, val in enumerate(row):
-                bg = (
-                    Color.color_by_number(val)
-                    if val
-                    else self.term.on_color_rgb(192, 192, 192)
-                )
-
-                print(
-                    self.term.move_xy(px * CELL_WIDTH, py)
-                    + bg
-                    + fg("[]" if val else "::")
-                    + self.term.normal
-                )
-
-        print(self.term.normal)
-
-    def __draw_piece(self, piece: Piece, offset_x=0, offset_y=0):
-        if not piece:
-            return
-
-        fg = self.term.black
-        for y, row in enumerate(piece.shape):
-            for x, val in enumerate(row):
-                bg = (
-                    Color.color_by_number(val)
-                    if val
-                    else self.term.on_color_rgb(192, 192, 192)
-                )
-                py = piece.y + y + offset_y
-                px = piece.x + x + offset_x
-
-                if (
-                    val
-                    and (py >= 0 and py < self.board.height + offset_y)
-                    and (px >= 0 and px < self.board.width + offset_x)
-                ):
-                    print(
-                        self.term.move_xy(px * CELL_WIDTH, py)
-                        + bg
-                        + fg("[]" if val else "::")
-                        + self.term.normal
-                    )
-
-        print(self.term.normal)
 
     def __draw_map(self, offset_px=0, offset_py=0):
         fg = self.term.black
@@ -219,6 +172,19 @@ class GameScene:
 
             if overflow:
                 self.game_over = True
+
+                if self.score:
+                    scores = CONN.get_all_scores()
+
+                    best_score = False
+                    for item in scores:
+                        if self.score > item.value:
+                            best_score = True
+                            break
+
+                    if best_score:
+                        CONN.try_save_score(name=self.player, score=self.score)
+
         else:
             self.total_fallen_blocks += 1
             total_next_blocks = len(self.falling_blocks_queue)
@@ -230,40 +196,72 @@ class GameScene:
 
             time.sleep(0.1)
 
-    def __draw_game_info(self):
-        next_piece = self.falling_blocks_queue[0]
-        next_box_width = BOARD_WIDTH * 2 + 2
-        score_y = 1
-        next_y = 5
-        level_y = next_y + score_y + 8
-        lines_y = level_y + 3
-
-        Shapes.draw_square(
-            width=next_box_width,
-            height=20,
-            fill_char=" ",
-            start_x=next_box_width,
-            start_y=0,
+    def __draw_total_lines(self):
+        offset_x = BOARD_WIDTH * 2 - 1
+        Drawer.draw_text(
+            text="         LINES        ",
+            fg=self.term.black,
+            bg=self.term.on_darkseagreen,
+            x=offset_x,
+            y=0,
+        )
+        Drawer.draw_text(
+            text=f" {self.lines_cleared}               ",
+            x=offset_x,
+            y=1,
         )
 
-        Shapes.draw_text(
+    def __draw_player(self):
+        offset_x = 0
+        Drawer.draw_text(
+            text="      PLAYER      ",
+            fg=self.term.black,
+            bg=self.term.on_darkseagreen,
+            x=offset_x,
+            y=0,
+        )
+        Drawer.draw_text(
+            text=f" {self.player}",
+            x=offset_x,
+            y=1,
+        )
+
+    def __draw_game_info(self):
+        next_piece = self.falling_blocks_queue[0]
+        next_box_width = BOARD_WIDTH * 2 + BOARD["OFFSET_X"] + 2
+        score_y = 0
+        next_y = 5
+        level_y = next_y + score_y + 8
+
+        Drawer.draw_square(
+            width=BOARD_WIDTH * 2,
+            height=8,
+            fill_char=" ",
+            start_x=next_box_width,
+            start_y=6,
+        )
+
+        Drawer.draw_text(
             text="         SCORE        ",
-            bg=self.term.on_black,
+            fg=self.term.black,
+            bg=self.term.on_darkseagreen,
             x=next_box_width,
             y=score_y,
         )
-        Shapes.draw_text(
+        Drawer.draw_text(
             text=f" {self.score}",
             x=next_box_width,
             y=score_y + 1,
         )
 
-        Shapes.draw_text(
+        Drawer.draw_text(
             text="         NEXT         ",
-            bg=self.term.on_black,
+            fg=self.term.black,
+            bg=self.term.on_darkseagreen,
             x=next_box_width,
             y=next_y,
         )
+
         if len(self.falling_blocks_queue) > 0:
             offset_x = next_box_width + 3
             offset_y = 2
@@ -272,30 +270,25 @@ class GameScene:
             next.x = 0
             next.y = 0
 
-            self.__draw_piece(next, offset_x - 10, offset_y + next_y)
+            # self.__draw_piece(next, offset_x - 10, offset_y + next_y)
+            Drawer.draw_piece(
+                board=self.board,
+                piece=next,
+                offset_x=offset_x,
+                offset_y=offset_y + next_y,
+            )
 
-        Shapes.draw_text(
+        Drawer.draw_text(
             text="         LEVEL        ",
-            bg=self.term.on_black,
+            fg=self.term.black,
+            bg=self.term.on_darkseagreen,
             x=next_box_width,
             y=level_y,
         )
-        Shapes.draw_text(
+        Drawer.draw_text(
             text=f" {self.level}",
             x=next_box_width,
             y=level_y + 1,
-        )
-
-        Shapes.draw_text(
-            text="         LINES        ",
-            bg=self.term.on_black,
-            x=next_box_width,
-            y=lines_y,
-        )
-        Shapes.draw_text(
-            text=f" {self.lines_cleared}",
-            x=next_box_width,
-            y=lines_y + 1,
         )
 
     def __reset(self):

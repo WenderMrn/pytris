@@ -3,7 +3,7 @@ import time
 from typing import Literal
 
 
-from config import PIECES, BOARD_HEIGHT, BOARD_WIDTH, PIECE_NAMES
+from config import BOARD, PIECES, BOARD_HEIGHT, BOARD_WIDTH, PIECE_NAMES
 
 random.seed(time.time())
 
@@ -65,9 +65,6 @@ class Piece:
         direction: Literal["UP", "DOWN", "LEFT", "RIGHT"],
         value=1,
     ):
-        if direction == "UP":
-            self.y = max(0, self.y - value)
-
         if direction == "DOWN":
             self.y = min(self.y + value, BOARD_HEIGHT - self.height)
 
@@ -81,6 +78,8 @@ class Piece:
         self.__rotation_idx = self.__normalize_idx(
             idx if idx else self.__rotation_idx + 1
         )
+        self.y = min(self.y, BOARD_HEIGHT - self.height)
+        self.x = min(self.x, BOARD_WIDTH - self.width)
 
     def calc_next_rotate(self):
         return Piece(self.__name, self.__normalize_idx(self.__rotation_idx + 1))

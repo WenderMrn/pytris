@@ -1,6 +1,5 @@
 import numpy as np
 from config import BOARD_HEIGHT, BOARD_WIDTH, TERM
-from core.shapes import Shapes
 from entities.piece import Piece
 
 

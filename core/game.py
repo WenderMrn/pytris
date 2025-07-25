@@ -1,43 +1,34 @@
-import copy
-import threading
 import time
 
 from blessed import Terminal
 
-from config import GAME_SPEED
-from scenes.game_scene import GameScene
+from config import CONN, GAME_SPEED
+from core.key_event_observable import KeyEventObservable
+from core.screen_manager import ScreenManager
+
 
 term = Terminal()
+key_observable = KeyEventObservable(term)
 
 
 def run():
     with term.fullscreen(), term.cbreak(), term.hidden_cursor():
-        scene = GameScene(term)
+        screen_manager = ScreenManager()
         running = True
-        time_per_frame = 1 / GAME_SPEED
+        time_per_frame = max(1 / GAME_SPEED, 0.01)
+
+        key_observable.subscribe(screen_manager.handle_event)
+        key_observable.start()
 
         print(term.home + term.clear)
 
-        threading.Thread(target=scene.key_listener, daemon=True).start()
-
         while running:
-            start_time = time.time()
-            # Limpa a tela
+            screen_manager.update()
+            screen_manager.render()
+            screen_manager.show_info()
 
-            if not scene.pause and not scene.game_over:
-                scene.update()
-                scene.draw()
-            else:
-                scene.show_messages()
-
-            running = scene.running
-
-            elapsed = time.time() - start_time
-            # time.sleep(max(0, 1 / 60 - elapsed))
-            # time.sleep(max(0, time_per_frame - elapsed))
+            running = screen_manager.running
             time.sleep(time_per_frame)
 
-            # print(term.move(20, 0) + f"Tick: {elapsed}")
-
-        print("exiting....")
+        key_observable.stop()
         exit(0)
