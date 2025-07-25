@@ -254,14 +254,13 @@ class GameScene(ScreenGame):
         )
 
         if len(self.falling_blocks_queue) > 0:
-            offset_x = next_box_width + 3
+            offset_x = next_box_width + 8
             offset_y = 2
 
             next = copy.deepcopy(next_piece)
             next.x = 0
             next.y = 0
 
-            # self.__draw_piece(next, offset_x - 10, offset_y + next_y)
             Drawer.draw_piece(
                 board=self.board,
                 piece=next,
