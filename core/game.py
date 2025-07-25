@@ -22,12 +22,15 @@ def run():
 
         print(term.home + term.clear)
 
-        while running:
+        while True:
             screen_manager.update()
             screen_manager.render()
             screen_manager.show_info()
 
             running = screen_manager.running
+            if not running:
+                break
+
             time.sleep(time_per_frame)
 
         key_observable.stop()

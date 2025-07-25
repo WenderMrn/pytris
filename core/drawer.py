@@ -118,7 +118,7 @@ class Drawer:
 
         for y, row in enumerate(piece.shape):
             for x, val in enumerate(row):
-                bg = Color.bg_color(val) if val else TERM.on_color_rgb(192, 192, 192)
+                bg = Color.bg_color(val) if val else TERM.on_white
                 fg = Color.fg_color(val) if val else TERM.white
                 py = piece.y + y
                 px = piece.x + x

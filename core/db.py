@@ -22,8 +22,25 @@ with sqlite3.connect("pytetris_database.db", check_same_thread=False) as conn:
 
         def try_save_score(self, name: str, score: int):
             cursor.execute(
-                "INSERT INTO users (name, score) VALUES (?, ?)", (name, score)
+                """
+                INSERT INTO users (name, score)
+                SELECT ?, ?
+                WHERE (
+                    (SELECT COUNT(*) FROM users) < 5
+                    OR
+                    ? > (
+                        SELECT MIN(score) FROM (
+                            SELECT score FROM users ORDER BY score DESC LIMIT 5
+                        )
+                    )
+                )
+                AND NOT EXISTS (
+                    SELECT 1 FROM users WHERE name = ? AND score = ?
+                )
+            """,
+                (name, score, score, name, score),
             )
+
             conn.commit()
 
         def get_all_scores(self) -> list[Score]:

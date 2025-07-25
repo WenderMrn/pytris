@@ -35,11 +35,11 @@ class TopScores(ScreenGame):
 
         scores = sorted(self.scores, key=lambda s: s.value, reverse=True)
         for i, score in enumerate(scores[:5]):
-            dots_size = 40 - min(len(score.name) + len(str(score.value)), 40)
+            dots_size = 35 - min(len(score.name) + len(str(score.value)), 35)
             Drawer.draw_text(
-                text=f"{i+1}. {str(score.name).upper()}"
+                text=f"{i+1}. {str(score.name).upper()} "
                 + "." * dots_size
-                + f"{score.value}",
+                + f" {score.value}",
                 x=offset_x + 4,
                 y=10 + i,
                 fg=TERM.black,

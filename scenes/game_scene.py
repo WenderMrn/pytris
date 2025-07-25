@@ -174,16 +174,7 @@ class GameScene(ScreenGame):
                 self.game_over = True
 
                 if self.score:
-                    scores = CONN.get_all_scores()
-
-                    best_score = False
-                    for item in scores:
-                        if self.score > item.value:
-                            best_score = True
-                            break
-
-                    if best_score:
-                        CONN.try_save_score(name=self.player, score=self.score)
+                    CONN.try_save_score(name=str(self.player).upper(), score=self.score)
 
         else:
             self.total_fallen_blocks += 1
