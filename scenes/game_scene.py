@@ -115,7 +115,7 @@ class GameScene(ScreenGame):
             self.__draw_map(40, 0)
 
     def show_info(self):
-        Drawer.render_game_instructions("GAME", 13, 25)
+        Drawer.render_game_instructions("GAME", 13, 26)
 
         if self.pause:
             Drawer.draw_text(
