@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Final, Literal
 from blessed import Terminal
 
@@ -7,11 +8,15 @@ from core.db import Db
 TERM = Terminal()
 CONN = Db()
 
-BOARD: Final = {"WIDTH": 10, "HEIGHT": 10, "OFFSET_X": 30, "OFFSET_Y": 5}
 
-BOARD_WIDTH: Final = 10
-BOARD_HEIGHT: Final = 20
-CELL_WIDTH: Final = 2
+class BoardValues(Enum):
+    WIDTH = 10
+    HEIGHT = 20
+    OFFSET_X = 30
+    OFFSET_Y = 5
+    CELL_WIDTH = 2
+
+
 DEBUG: Final = False
 GAME_SPEED: Final = 1.75
 PLAYER_SEED: Final = 1

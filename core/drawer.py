@@ -2,12 +2,9 @@ import os
 from typing import List, Literal
 from config import (
     BLOCK_LETTERS,
-    BOARD,
-    BOARD_HEIGHT,
-    BOARD_WIDTH,
-    CELL_WIDTH,
     SMALL_BLOCK_LETTERS,
     TERM,
+    BoardValues,
 )
 from entities.board import Board
 from entities.color import Color
@@ -75,8 +72,8 @@ class Drawer:
         offset_y: int = 0,
     ):
         if center:
-            x = BOARD_WIDTH - len(text) // 2
-            y = BOARD_HEIGHT // 2
+            x = BoardValues.WIDTH - len(text) // 2
+            y = BoardValues.HEIGHT // 2
 
         print(
             TERM.move_xy(
@@ -96,7 +93,8 @@ class Drawer:
 
                 print(
                     TERM.move_xy(
-                        px * CELL_WIDTH + BOARD["OFFSET_X"], py + BOARD["OFFSET_Y"]
+                        px * BoardValues.CELL_WIDTH + BoardValues.OFFSET_X,
+                        py + BoardValues.OFFSET_Y,
                     )
                     + bg
                     + fg("[]" if val else "⬜")
@@ -110,8 +108,8 @@ class Drawer:
         *,
         board: Board,
         piece: Piece,
-        x=BOARD["OFFSET_X"],
-        y=BOARD["OFFSET_Y"],
+        x=BoardValues.OFFSET_X,
+        y=BoardValues.OFFSET_Y,
     ):
         if not piece:
             return
@@ -129,7 +127,7 @@ class Drawer:
                     and (px >= 0 and px < board.width)
                 ):
                     print(
-                        TERM.move_xy(px * CELL_WIDTH + x, py + y)
+                        TERM.move_xy(px * BoardValues.CELL_WIDTH + x, py + y)
                         + bg
                         + fg("[]" if val else "")
                         + TERM.normal
@@ -143,8 +141,8 @@ class Drawer:
         text: str,
         fg_color=None,
         bg_color=TERM.normal,
-        x=BOARD["OFFSET_X"],
-        y=BOARD["OFFSET_Y"],
+        x=BoardValues.OFFSET_X,
+        y=BoardValues.OFFSET_Y,
     ):
 
         big_text = text2art(text=text.upper(), font="big")

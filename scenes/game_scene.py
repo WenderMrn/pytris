@@ -4,12 +4,10 @@ from typing import List
 from blessed import Terminal, keyboard
 
 from config import (
-    BOARD,
-    BOARD_HEIGHT,
-    BOARD_WIDTH,
     CONN,
     DEBUG,
     GAME_SPEED,
+    BoardValues,
 )
 from core.db import Db
 from core.drawer import Drawer
@@ -43,7 +41,7 @@ class GameScene(ScreenGame):
         self.total_fallen_blocks = 0
         self.falling_blocks_queue: List[Piece] = Piece.random_list(2)
 
-        self.board = Board(width=BOARD_WIDTH, height=BOARD_HEIGHT)
+        self.board = Board(width=BoardValues.WIDTH, height=BoardValues.HEIGHT)
         self._last_update = time.perf_counter() * 1000
 
     def __mock(self):
@@ -121,16 +119,16 @@ class GameScene(ScreenGame):
                 text="PAUSED",
                 center=True,
                 bg=self.term.on_red,
-                offset_y=BOARD["OFFSET_Y"],
-                offset_x=BOARD["OFFSET_X"],
+                offset_y=BoardValues.OFFSET_Y,
+                offset_x=BoardValues.OFFSET_X,
             )
         elif self.game_over:
             Drawer.draw_text(
                 text="GAME OVER!",
                 center=True,
                 bg=self.term.on_red,
-                offset_y=BOARD["OFFSET_Y"],
-                offset_x=BOARD["OFFSET_X"],
+                offset_y=BoardValues.OFFSET_Y,
+                offset_x=BoardValues.OFFSET_X,
             )
 
     def __calculate_score(self):
@@ -189,7 +187,7 @@ class GameScene(ScreenGame):
             time.sleep(0.1)
 
     def __draw_total_lines(self):
-        offset_x = BOARD_WIDTH * 2 + 10
+        offset_x = BoardValues.WIDTH * 2 + 10
         offset_y = 1
         Drawer.draw_text(
             text="        LINES       ",
@@ -222,13 +220,13 @@ class GameScene(ScreenGame):
 
     def __draw_game_info(self):
         next_piece = self.falling_blocks_queue[0]
-        next_box_width = BOARD_WIDTH * 2 + BOARD["OFFSET_X"] + 2
+        next_box_width = BoardValues.WIDTH * 2 + BoardValues.OFFSET_X + 2
         score_y = 4
         next_y = 10
         level_y = next_y + score_y + 4
 
         Drawer.draw_square(
-            width=BOARD_WIDTH * 2 + 2,
+            width=BoardValues.WIDTH * 2 + 2,
             height=8,
             fill_char=" ",
             start_x=next_box_width,

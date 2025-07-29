@@ -1,5 +1,5 @@
 import numpy as np
-from config import BOARD_HEIGHT, BOARD_WIDTH, TERM
+from config import BoardValues
 from entities.piece import Piece
 
 
@@ -88,7 +88,7 @@ class Board:
                 count += 1
 
         while len(new_board) < len(board):
-            new_board.insert(0, [0 for _ in range(BOARD_WIDTH)])
+            new_board.insert(0, [0 for _ in range(BoardValues.WIDTH)])
 
         self.__shape = new_board
 

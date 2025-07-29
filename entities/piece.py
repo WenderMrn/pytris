@@ -3,7 +3,7 @@ import time
 from typing import Literal
 
 
-from config import BOARD, PIECES, BOARD_HEIGHT, BOARD_WIDTH, PIECE_NAMES
+from config import PIECES, PIECE_NAMES, BoardValues
 
 random.seed(time.time())
 
@@ -21,13 +21,13 @@ class Piece:
 
     @staticmethod
     def random_new():
-        random_x = random.randrange(0, BOARD_WIDTH - 1)
+        random_x = random.randrange(0, BoardValues.WIDTH - 1)
         random_rotation = random.randrange(0, 4)
         random_name = random.choice(Piece.names())
 
         piece = Piece(type=random_name, rotation=random_rotation)
 
-        piece.x = max(0, min(random_x, BOARD_WIDTH - piece.width))
+        piece.x = max(0, min(random_x, BoardValues.WIDTH - piece.width))
         piece.y -= piece.height - 1
 
         return piece
@@ -66,10 +66,10 @@ class Piece:
         value=1,
     ):
         if direction == "DOWN":
-            self.y = min(self.y + value, BOARD_HEIGHT - self.height)
+            self.y = min(self.y + value, BoardValues.HEIGHT - self.height)
 
         if direction == "RIGHT":
-            self.x = min(self.x + value, BOARD_WIDTH - self.width)
+            self.x = min(self.x + value, BoardValues.WIDTH - self.width)
 
         if direction == "LEFT":
             self.x = max(0, self.x - value)
@@ -78,8 +78,8 @@ class Piece:
         self.__rotation_idx = self.__normalize_idx(
             idx if idx else self.__rotation_idx + 1
         )
-        self.y = min(self.y, BOARD_HEIGHT - self.height)
-        self.x = min(self.x, BOARD_WIDTH - self.width)
+        self.y = min(self.y, BoardValues.HEIGHT - self.height)
+        self.x = min(self.x, BoardValues.WIDTH - self.width)
 
     def calc_next_rotate(self):
         return Piece(self.__name, self.__normalize_idx(self.__rotation_idx + 1))
