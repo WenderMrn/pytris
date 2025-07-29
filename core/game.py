@@ -4,7 +4,7 @@ import time
 
 from blessed import Terminal
 
-from config import CONN, GAME_SPEED
+from config import GAME_SPEED
 from core.key_event_observable import KeyEventObservable
 from core.screen_manager import ScreenManager
 

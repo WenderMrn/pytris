@@ -1,9 +1,7 @@
-from typing import List
 from config import CONN, TERM
-from core.db import Db
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
-from core.types import GameEvent, Score
+from core.types import GameEvent
 
 
 class TopScores(ScreenGame):

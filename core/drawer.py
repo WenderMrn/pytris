@@ -1,4 +1,3 @@
-import os
 from typing import List, Literal
 from config import (
     BLOCK_LETTERS,

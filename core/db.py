@@ -21,7 +21,6 @@ with sqlite3.connect("pytetris_database.db", check_same_thread=False) as conn:
             )
 
         def try_save_score(self, name: str, score: int):
-            # Garante a inserção ou atualização
             cursor.execute(
                 """
                 INSERT INTO users (name, score)
@@ -35,7 +34,6 @@ with sqlite3.connect("pytetris_database.db", check_same_thread=False) as conn:
                 (name, score),
             )
 
-            # Mantém apenas os 5 melhores scores
             cursor.execute(
                 """
                 DELETE FROM users

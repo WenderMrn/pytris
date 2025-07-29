@@ -9,12 +9,10 @@ from config import (
     GAME_SPEED,
     BoardValues,
 )
-from core.db import Db
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
 from core.types import GameEvent
 from entities.board import Board
-from entities.color import Color
 from entities.piece import Piece
 
 BOARD_OFFSET_X = 0

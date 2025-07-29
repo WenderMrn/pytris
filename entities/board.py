@@ -1,4 +1,3 @@
-import numpy as np
 from config import BoardValues
 from entities.piece import Piece
 
