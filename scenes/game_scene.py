@@ -36,10 +36,10 @@ class GameScene(ScreenGame):
         self.level = 0
         self.score = 0
         self.lines_cleared = 0
+        self.distance_hard_drop = 0
         self.game_speed = GAME_SPEED
 
         self.falling_block = None
-        self.prev_falling_block = None
         self.total_fallen_blocks = 0
         self.falling_blocks_queue: List[Piece] = Piece.random_list(2)
 
@@ -54,7 +54,6 @@ class GameScene(ScreenGame):
     def handle_event(self, key: keyboard.Keystroke):
         if self.falling_block:
             try_move = copy.deepcopy(self.falling_block)
-            self.prev_falling_block = copy.deepcopy(self.falling_block)
             if key.code == self.term.KEY_RIGHT:
                 try_move.move("RIGHT")
                 collision, _ = self.board.check_next_collision(try_move)
@@ -66,8 +65,10 @@ class GameScene(ScreenGame):
                 if not collision:
                     self.falling_block.move("LEFT")
             elif key.code == self.term.KEY_DOWN:
+                self.distance_hard_drop = 0
                 while self.falling_block:
                     self.__move_current_block_down()
+                    self.distance_hard_drop += 1
 
             elif key.code == self.term.KEY_UP:
                 try_move.rotate()
@@ -75,8 +76,6 @@ class GameScene(ScreenGame):
 
                 if not collision:
                     self.falling_block.rotate()
-        else:
-            self.prev_falling_block = None
 
         if key.lower() == "p" and not self.game_over:
             self.pause = not self.pause
@@ -143,9 +142,10 @@ class GameScene(ScreenGame):
         score_per_lines = {1: 40, 2: 200, 3: 300, 4: 1200}
 
         self.score += score_per_lines.get(count, 0) * max(1, self.level)
+        self.score += self.distance_hard_drop * 2
         self.lines_cleared += count
         self.level = max(0, self.lines_cleared // 10)
-        self.game_speed = min(GAME_SPEED + (self.level * 0.25), 80)
+        self.game_speed = min(GAME_SPEED + (self.level * 0.5), 80)
 
     def __draw_map(self, offset_px=0, offset_py=0):
         fg = self.term.black
@@ -161,7 +161,6 @@ class GameScene(ScreenGame):
 
     def __move_current_block_down(self):
         if self.falling_block:
-            self.prev_falling_block = copy.deepcopy(self.falling_block)
             self.falling_block.move("DOWN")
 
             has_collision, overflow = self.board.check_next_collision(
@@ -216,7 +215,7 @@ class GameScene(ScreenGame):
             y=offset_y,
         )
         Drawer.draw_text(
-            text=f" {self.player}",
+            text=f" {self.player}    ",
             x=offset_x,
             y=offset_y + 2,
         )
@@ -244,7 +243,7 @@ class GameScene(ScreenGame):
             y=score_y,
         )
         Drawer.draw_text(
-            text=f" {self.score}",
+            text=f" {self.score}        ",
             x=next_box_width,
             y=score_y + 2,
         )
@@ -280,7 +279,7 @@ class GameScene(ScreenGame):
             y=level_y,
         )
         Drawer.draw_text(
-            text=f" {self.level}",
+            text=f" {self.level}        ",
             x=next_box_width,
             y=level_y + 2,
         )

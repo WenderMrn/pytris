@@ -14,31 +14,37 @@ with sqlite3.connect("pytetris_database.db", check_same_thread=False) as conn:
                 """
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    score INTEGER
+                    name TEXT NOT NULL UNIQUE,
+                    score INTEGER NOT NULL
                 )
             """
             )
 
         def try_save_score(self, name: str, score: int):
+            # Garante a inserção ou atualização
             cursor.execute(
                 """
                 INSERT INTO users (name, score)
-                SELECT ?, ?
-                WHERE (
-                    (SELECT COUNT(*) FROM users) < 5
-                    OR
-                    ? > (
-                        SELECT MIN(score) FROM (
-                            SELECT score FROM users ORDER BY score DESC LIMIT 5
-                        )
-                    )
+                VALUES (?, ?)
+                ON CONFLICT(name) DO UPDATE SET score = 
+                    CASE 
+                        WHEN excluded.score > users.score THEN excluded.score
+                        ELSE users.score
+                    END
+                """,
+                (name, score),
+            )
+
+            # Mantém apenas os 5 melhores scores
+            cursor.execute(
+                """
+                DELETE FROM users
+                WHERE name NOT IN (
+                    SELECT name FROM users
+                    ORDER BY score DESC
+                    LIMIT 5
                 )
-                AND NOT EXISTS (
-                    SELECT 1 FROM users WHERE name = ? AND score = ?
-                )
-            """,
-                (name, score, score, name, score),
+                """
             )
 
             conn.commit()

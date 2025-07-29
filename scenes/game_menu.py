@@ -55,8 +55,10 @@ class GameMenu(ScreenGame):
 
         offset_x = 20
         offset_screen_y = 2
-        offset_arrow_y = (offset_screen_y + 1) * self.__current_item
         offset_menu_y = 8
+        offset_arrow_y = (
+            offset_menu_y + (self.__current_item * 5) - (offset_menu_y // 2) + 1
+        )
 
         Drawer.draw_square(
             width=52,
@@ -96,7 +98,7 @@ class GameMenu(ScreenGame):
         Drawer.render_block_text(
             text=">",
             x=offset_x + 5,
-            y=offset_arrow_y + offset_menu_y - 1,
+            y=offset_arrow_y,
             fg_color=TERM.palegreen1,
             bg_color=TERM.on_darkseagreen,
         )
