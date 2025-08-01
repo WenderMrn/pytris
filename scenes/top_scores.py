@@ -64,5 +64,5 @@ class TopScores(ScreenGame):
         return super().show_info()
 
     def handle_event(self, key):
-        if key.code == TERM.KEY_ESCAPE or key == "\x1b":
+        if key.code == TERM.KEY_ESCAPE or key == r"\x1b":
             return GameEvent("Esc", "SCREEN_MENU", 0)

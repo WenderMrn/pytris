@@ -17,7 +17,7 @@ def resize_terminal(cols=100, rows=30):
     if platform.system() == "Windows":
         os.system(f"mode con: cols={cols} lines={rows}")
     else:
-        print(f"\033[8;{rows};{cols}t")
+        print(rf"\033[8;{rows};{cols}t")
 
 
 def run():

@@ -77,7 +77,7 @@ class GameScene(ScreenGame):
             self.pause = not self.pause
         elif key.lower() == "r":
             self.__reset()
-        elif key.code == self.term.KEY_ESCAPE or key == "\x1b":
+        elif key.code == self.term.KEY_ESCAPE or key == r"\x1b":
             self.running = False
             return GameEvent("Esc", "SCREEN_MENU", 0)
 

@@ -67,5 +67,5 @@ class NewGame(ScreenGame):
         elif (key.isalnum() or key == " ") and len(self.player) <= 15:
             self.player += key.upper()
             self.__update_draw = True
-        elif key.code == TERM.KEY_ESCAPE or key == "\x1b":
+        elif key.code == TERM.KEY_ESCAPE or key == r"\x1b":
             return GameEvent("Esc", "SCREEN_MENU", 0)
