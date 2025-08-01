@@ -1,4 +1,3 @@
-from collections import namedtuple
 from config import TERM, GameEventName
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
