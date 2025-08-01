@@ -40,7 +40,7 @@ Keep the console at a minimum of 100x30
 
 ### Screenshots
 
-![menu](/assets/images/examples/1.png"menu")
-![new game](/assets/images/examples/2.png"new-game")
-![game play](/assets/images/examples/3.png"game-play")
-![scores](/assets/images/examples/4.png"scores")
+![menu](assets/images/examples/1.png"menu")
+![new game](assets/images/examples/2.png"new-game")
+![game play](assets/images/examples/3.png"game-play")
+![scores](assets/images/examples/4.png"scores")
