@@ -1,44 +1,48 @@
 # Pytris
 
+#### Video Demo: https://youtu.be/JVsDOCG1Kq0
+
+#### Description
+
 A simple python game that runs on the console
 
-## Main Dependencies
+#### Main Dependencies
 
 - python 3.13.5
 - pysqlite 2.8.3
 - blessed 1.21.0
 
-### Create ENV
+#### Create ENV
 
 ```bash
 python -m venv env
 ```
 
-### Active ENV
+#### Active ENV
 
 ```bash
 source env/bin/activate
 ```
 
-### Deactivate
+#### Deactivate
 
 ```bash
 deactivate
 ```
 
-### Create requiments.txt
+#### Create requiments.txt
 
 pip freeze > requirements.txt
 
-### Run on watch mode
+#### Run on watch mode
 
 watchfiles 'python main.py' .
 
-### Keep console size
+#### Keep console size
 
 Keep the console at a minimum of 100x30
 
-## Sqlite schema
+#### Sqlite schema
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (
@@ -49,7 +53,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 ```
 
-### Screenshots
+#### Screenshots
 
 <img src="./assets/images/examples/1.png" alt="menu" width="550" height="400">
 <img src="./assets/images/examples/2.png" alt="new game" width="550" height="400">
