@@ -116,7 +116,7 @@ class GameScene(ScreenGame):
             Drawer.draw_text(
                 text="PAUSED",
                 center=True,
-                bg=self.term.on_red,
+                bg_color=self.term.on_red,
                 offset_y=BoardValues.OFFSET_Y,
                 offset_x=BoardValues.OFFSET_X,
             )
@@ -124,7 +124,7 @@ class GameScene(ScreenGame):
             Drawer.draw_text(
                 text="GAME OVER!",
                 center=True,
-                bg=self.term.on_red,
+                bg_color=self.term.on_red,
                 offset_y=BoardValues.OFFSET_Y,
                 offset_x=BoardValues.OFFSET_X,
             )
@@ -189,8 +189,8 @@ class GameScene(ScreenGame):
         offset_y = 1
         Drawer.draw_text(
             text="        LINES       ",
-            fg=self.term.black,
-            bg=self.term.on_darkseagreen,
+            fg_color=self.term.black,
+            bg_color=self.term.on_darkseagreen,
             x=offset_x,
             y=offset_y,
         )
@@ -205,8 +205,8 @@ class GameScene(ScreenGame):
         offset_y = 4
         Drawer.draw_text(
             text="      PLAYER      ",
-            fg=self.term.black,
-            bg=self.term.on_darkseagreen,
+            fg_color=self.term.black,
+            bg_color=self.term.on_darkseagreen,
             x=offset_x,
             y=offset_y,
         )
@@ -233,8 +233,8 @@ class GameScene(ScreenGame):
 
         Drawer.draw_text(
             text="         SCORE        ",
-            fg=self.term.black,
-            bg=self.term.on_darkseagreen,
+            fg_color=self.term.black,
+            bg_color=self.term.on_darkseagreen,
             x=next_box_width,
             y=score_y,
         )
@@ -246,8 +246,8 @@ class GameScene(ScreenGame):
 
         Drawer.draw_text(
             text="         NEXT         ",
-            fg=self.term.black,
-            bg=self.term.on_darkseagreen,
+            fg_color=self.term.black,
+            bg_color=self.term.on_darkseagreen,
             x=next_box_width,
             y=next_y,
         )
@@ -269,8 +269,8 @@ class GameScene(ScreenGame):
 
         Drawer.draw_text(
             text="         LEVEL        ",
-            fg=self.term.black,
-            bg=self.term.on_darkseagreen,
+            fg_color=self.term.black,
+            bg_color=self.term.on_darkseagreen,
             x=next_box_width,
             y=level_y,
         )

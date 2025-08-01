@@ -80,8 +80,8 @@ class GameMenu(ScreenGame):
             text="+" * 50,
             x=offset_x + 1,
             y=offset_screen_y + 6,
-            fg=TERM.black,
-            bg=TERM.on_darkseagreen,
+            fg_color=TERM.black,
+            bg_color=TERM.on_darkseagreen,
         )
 
         for y, item in enumerate(self.__options):

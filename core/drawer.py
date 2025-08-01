@@ -63,8 +63,8 @@ class Drawer:
     def draw_text(
         text: str,
         center: bool = False,
-        fg=TERM.white,
-        bg=TERM.normal,
+        fg_color=TERM.white,
+        bg_color=TERM.normal,
         x: int = 0,
         y: int = 0,
         offset_x: int = 0,
@@ -79,8 +79,8 @@ class Drawer:
                 x + offset_x,
                 y + offset_y,
             )
-            + bg
-            + (fg(text) if fg else text + TERM.normal)
+            + bg_color
+            + (fg_color(text) if fg_color else text + TERM.normal)
         )
 
     @staticmethod
@@ -154,11 +154,6 @@ class Drawer:
                 + TERM.normal
             )
 
-        # with TERM.fullscreen(), TERM.cbreak(), TERM.hidden_cursor():
-        #     print(TERM.clear)
-        #     print(TERM.center(TERM.bold_yellow(big_text)))
-        #     TERM.sleep(3)
-
     @staticmethod
     def render_block_text(
         *,
@@ -172,7 +167,6 @@ class Drawer:
         text = text.upper()
         letters = BLOCK_LETTERS if size == "big" else SMALL_BLOCK_LETTERS
 
-        # define altura
         height = len(next(iter(letters.values()), []))
         lines = ["" for _ in range(height)]
 
@@ -214,7 +208,3 @@ class Drawer:
         if len(messages) > 0:
             for ly, line in enumerate(messages):
                 print(TERM.move_xy(x, y + ly) + line + TERM.normal, end="")
-
-    @staticmethod
-    def render_screen():
-        pass

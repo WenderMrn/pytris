@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 from typing import Final, Literal
 from blessed import Terminal
 
@@ -9,7 +9,7 @@ TERM = Terminal()
 CONN = Db()
 
 
-class BoardValues(Enum):
+class BoardValues(IntEnum):
     WIDTH = 10
     HEIGHT = 20
     OFFSET_X = 30

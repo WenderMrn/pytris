@@ -42,8 +42,8 @@ class TopScores(ScreenGame):
                 + f" {score.value}",
                 x=offset_x + 4,
                 y=10 + i,
-                fg=TERM.black,
-                bg=TERM.on_darkseagreen,
+                fg_color=TERM.black,
+                bg_color=TERM.on_darkseagreen,
             )
 
         if len(scores) == 0:
@@ -51,8 +51,8 @@ class TopScores(ScreenGame):
                 text=f"No scores",
                 x=offset_x + 4,
                 y=10,
-                fg=TERM.black,
-                bg=TERM.on_darkseagreen,
+                fg_color=TERM.black,
+                bg_color=TERM.on_darkseagreen,
             )
 
         self.__update_draw = False
