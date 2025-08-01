@@ -2,7 +2,7 @@
 
 A simple python game that runs on the console
 
-## Dependencies
+## Main Dependencies
 
 - python 3.13.5
 - pysqlite 2.8.3
@@ -38,9 +38,22 @@ watchfiles 'python main.py' .
 
 Keep the console at a minimum of 100x30
 
+## Sqlite schema
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    score INTEGER NOT NULL
+)
+
+```
+
 ### Screenshots
 
-![menu](assets/images/examples/1.png"menu")
-![new game](assets/images/examples/2.png"new-game")
-![game play](assets/images/examples/3.png"game-play")
-![scores](assets/images/examples/4.png"scores")
+<img src="./assets/images/examples/1.png" alt="menu" width="550" height="400">
+<img src="./assets/images/examples/2.png" alt="new game" width="550" height="400">
+<img src="./assets/images/examples/3.png" alt="game play" width="550" height="400">
+<img src="./assets/images/examples/5.png" alt="game play 2" width="550" height="400">
+<img src="./assets/images/examples/6.png" alt="game over" width="550" height="400">
+<img src="./assets/images/examples/4.png" alt="scores" width="550" height="400">
