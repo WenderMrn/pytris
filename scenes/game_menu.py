@@ -1,5 +1,5 @@
 from collections import namedtuple
-from config import TERM
+from config import TERM, GameEventName
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
 from core.types import GameEvent
@@ -41,9 +41,9 @@ class GameMenu(ScreenGame):
 
     def __menu_options(self):
         return [
-            GameEvent("New Game", "SCREEN_NEW_GAME", 1),
-            GameEvent("Top Scores", "SCREEN_TOP_SCORES", 2),
-            GameEvent("QUIT", "QUIT", 3),
+            GameEvent("New Game", GameEventName.SCREEN_NEW_GAME, 1),
+            GameEvent("Top Scores", GameEventName.SCREEN_TOP_SCORES, 2),
+            GameEvent("QUIT", GameEventName.QUIT_GAME, 3),
         ]
 
     def __draw_backgorund(self):

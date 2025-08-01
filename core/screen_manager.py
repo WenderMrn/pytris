@@ -1,4 +1,4 @@
-from config import TERM
+from config import TERM, GameEventName
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
 from scenes.game_menu import GameMenu
@@ -33,13 +33,13 @@ class ScreenManager:
         event = self.current_screen.handle_event(key)
 
         if event:
-            if event.name == "SCREEN_NEW_GAME":
+            if event.name == GameEventName.SCREEN_NEW_GAME:
                 self.change_screen(NewGame())
-            elif event.name == "SCREEN_MENU":
+            elif event.name == GameEventName.SCREEN_MENU:
                 self.change_screen(GameMenu())
-            elif event.name == "SCREEN_START_GAME":
+            elif event.name == GameEventName.SCREEN_START_GAME:
                 self.change_screen(GameScene(term=TERM, player=event.value))
-            elif event.name == "SCREEN_TOP_SCORES":
+            elif event.name == GameEventName.SCREEN_TOP_SCORES:
                 self.change_screen(TopScores())
-            elif event.name == "QUIT":
+            elif event.name == GameEventName.QUIT_GAME:
                 self.current_screen.running = False

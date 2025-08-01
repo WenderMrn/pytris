@@ -1,4 +1,4 @@
-from config import CONN, TERM
+from config import CONN, TERM, GameEventName
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
 from core.types import GameEvent
@@ -65,4 +65,4 @@ class TopScores(ScreenGame):
 
     def handle_event(self, key):
         if key.code == TERM.KEY_ESCAPE or key == r"\x1b":
-            return GameEvent("Esc", "SCREEN_MENU", 0)
+            return GameEvent("Esc", GameEventName.SCREEN_MENU, 0)

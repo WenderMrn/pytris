@@ -1,4 +1,4 @@
-from config import TERM
+from config import TERM, GameEventName
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
 from core.types import GameEvent
@@ -60,7 +60,7 @@ class NewGame(ScreenGame):
 
     def handle_event(self, key):
         if key.code in (TERM.KEY_ENTER, TERM.KEY_RETURN) and self.player:
-            return GameEvent("Start Game", "SCREEN_START_GAME", self.player)
+            return GameEvent("Start Game", GameEventName.SCREEN_START_GAME, self.player)
         elif key.code == TERM.KEY_BACKSPACE:
             self.player = self.player[:-1]
             self.__update_draw = True
@@ -68,4 +68,4 @@ class NewGame(ScreenGame):
             self.player += key.upper()
             self.__update_draw = True
         elif key.code == TERM.KEY_ESCAPE or key == r"\x1b":
-            return GameEvent("Esc", "SCREEN_MENU", 0)
+            return GameEvent("Esc", GameEventName.SCREEN_MENU, 0)

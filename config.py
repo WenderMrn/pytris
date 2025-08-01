@@ -17,6 +17,14 @@ class BoardValues(IntEnum):
     CELL_WIDTH = 2
 
 
+class GameEventName(IntEnum):
+    SCREEN_NEW_GAME = 1
+    SCREEN_MENU = 2
+    SCREEN_START_GAME = 3
+    SCREEN_TOP_SCORES = 4
+    QUIT_GAME = 5
+
+
 DEBUG: Final = False
 GAME_SPEED: Final = 1.75
 PLAYER_SEED: Final = 1
@@ -65,7 +73,8 @@ PIECES: Final  = {
     "T": [
         [
             [0, 2, 0], 
-            [2, 2, 2]],
+            [2, 2, 2]
+        ],
         [
             [2, 0], 
             [2, 2], 

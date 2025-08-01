@@ -46,19 +46,6 @@ class Board:
                         if not board[py][px]:
                             board[py][px] = val
 
-    def clear_block(self, piece: Piece):
-        board = self.shape
-
-        x = min(piece.x, self.width)
-        y = min(piece.y, self.height)
-
-        for i, row in enumerate(piece.shape):
-            for j, val in enumerate(row):
-                py = min(min(i + y, i + y - piece.height), self.height - 1)
-                px = min(max(j, j + x - piece.width), self.width - 1)
-
-                board[py][px] = 0
-
     def check_next_collision(self, piece: Piece):
         for y, row in enumerate(piece.shape):
             for x, col in enumerate(row):

@@ -8,6 +8,7 @@ from config import (
     DEBUG,
     GAME_SPEED,
     BoardValues,
+    GameEventName,
 )
 from core.drawer import Drawer
 from core.screen_game import ScreenGame
@@ -79,7 +80,7 @@ class GameScene(ScreenGame):
             self.__reset()
         elif key.code == self.term.KEY_ESCAPE or key == r"\x1b":
             self.running = False
-            return GameEvent("Esc", "SCREEN_MENU", 0)
+            return GameEvent("Esc", GameEventName.SCREEN_MENU, 0)
 
     def update(self):
         if self.pause or self.game_over or not self.running:
